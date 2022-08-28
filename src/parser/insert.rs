@@ -32,36 +32,36 @@ impl InsertQuery {
                     fetch: _fetch,
                 } => {
                     if let SetExpr::Values(values) = body {
-                        if let Values(expressions) = values {
-                            for i in expressions {
-                                let mut value_set: Vec<String> = vec![];
-                                for e in i {
-                                    match e {
-                                        Expr::Value(v) => match v {
-                                            Value::Number(n) => {
-                                                value_set.push(n.to_string());
-                                            }
-                                            Value::Boolean(b) => match *b {
-                                                true => value_set.push("true".to_string()),
-                                                false => value_set.push("false".to_string()),
-                                            },
-                                            Value::SingleQuotedString(sqs) => {
-                                                value_set.push(sqs.to_string());
-                                            }
-                                            Value::Null => {
-                                                value_set.push("Null".to_string());
-                                            }
-                                            _ => {}
+                        let Values(expressions) = values;
+                        for i in expressions {
+                            let mut value_set: Vec<String> = vec![];
+                            for e in i {
+                                match e {
+                                    Expr::Value(v) => match v {
+                                        Value::Number(n) => {
+                                            value_set.push(n.to_string());
+                                        }
+                                        Value::Boolean(b) => match *b {
+                                            true => value_set.push("true".to_string()),
+                                            false => value_set.push("false".to_string()),
                                         },
-                                        Expr::Identifier(i) => {
-                                            value_set.push(i.to_string());
+                                        Value::SingleQuotedString(sqs) => {
+                                            value_set.push(sqs.to_string());
+                                        }
+                                        Value::Null => {
+                                            value_set.push("Null".to_string());
                                         }
                                         _ => {}
+                                    },
+                                    Expr::Identifier(i) => {
+                                        value_set.push(i.to_string());
                                     }
+                                    _ => {}
                                 }
-                                all_vals.push(value_set);
                             }
+                            all_vals.push(value_set);
                         }
+                        
                     }
                 }
             }

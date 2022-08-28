@@ -63,7 +63,7 @@ impl SelectQuery {
                             Wildcard => {
                                 projection.push("*".to_string());
                             }
-                            ExprWithAlias { expr, alias } => match expr {
+                            ExprWithAlias { expr, .. } => match expr {
                                 Expr::Identifier(i) => {
                                     projection.push(i.to_string());
                                 }
