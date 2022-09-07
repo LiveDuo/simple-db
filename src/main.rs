@@ -114,7 +114,6 @@ fn process_command(query: String, db: &mut Database) {
     let statements = &Parser::parse_sql(&dialect, query).unwrap_or_default();
 
     for s in statements {
-        println!("{:?}", s);
         match s {
             Statement::CreateTable { .. } => {
                 let cq = CreateQuery::new(s).unwrap();
