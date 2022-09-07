@@ -111,7 +111,7 @@ fn handle_meta_command(cmd: MetaCommand, db: &mut Database) {
 
 fn process_command(query: String, db: &mut Database) {
     let dialect = MySqlDialect {};
-    let statements = &Parser::parse_sql(&dialect, query).unwrap();
+    let statements = &Parser::parse_sql(&dialect, query).unwrap_or_default();
 
     for s in statements {
         println!("{:?}", s);
