@@ -98,3 +98,27 @@ struct Database { tables: Vec<Table>, }
 		is_indexed __bool__
 		index __ColumnIndex__ `enum` -> BTreeMap
 		is_primary_key __bool__
+
+
+### Dry Run
+
+- "create table _table_ ..."
+```rust
+process_command(query, &mut db);
+	let cq = CreateQuery::new(s).unwrap();
+		Ok(CreateQuery { table_name: table_name.to_string(), columns: parsed_columns, });
+  db.tables.push(Table::new(cq));
+```
+
+[Table { columns: [ColumnHeader { name: "id", datatype: Int, is_indexed: true, index: Int({}), is_primary_key: true }, ColumnHeader { name: "name", datatype: Str, is_indexed: false, index: Str({}), is_primary_key: false }, ColumnHeader { name: "score", datatype: Float, is_indexed: false, index: None, is_primary_key: false }], name: "test", rows: {"score": Float([]), "id": Int([]), "name": Str([])} }]
+
+- "insert into _table_ ..."
+```rust
+process_command(query, &mut db);
+```
+
+- "select * from _table_ ...;"
+```rust
+process_command(query, &mut db);
+```
+
