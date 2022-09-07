@@ -24,7 +24,7 @@
 
 
 
-```go
+```rust
 
 use parser::create::CreateQuery; insert::InsertQuery; select::SelectQuery;
 use sqlparser::ast::Statement; dialect::MySqlDialect; parser::Parser;
@@ -77,3 +77,24 @@ fn main() {
 }
 ```
 
+
+```rust
+enum ColumnIndex { Int(BTreeMap<i32, usize>), Str(BTreeMap<String, usize>), Bool(BTreeMap<bool, usize>), None, }
+enum DataType { Int, Str, Float, Bool, Invalid, }
+enum ColumnData { Int(Vec<i32>), Str(Vec<String>), Float(Vec<f32>), Bool(Vec<bool>), None, }
+
+struct ColumnHeader { name: String, datatype: DataType, is_indexed: bool, index: ColumnIndex, is_primary_key: bool, }
+struct Table { columns: Vec<ColumnHeader>, name: String, rows: HashMap<String, ColumnData>, }
+struct Database { tables: Vec<Table>, }
+```
+
+## Database Schema
+
+- tables __Vec<Table>__
+	- rows __HashMap<String,ColumnData>__ `enum`
+	- columns __Vec<ColumnHeader>__ `struct`
+		name __String__
+		datatype __DataType__ `enum` -> primitive
+		is_indexed __bool__
+		index __ColumnIndex__ `enum` -> BTreeMap
+		is_primary_key __bool__
