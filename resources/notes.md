@@ -110,15 +110,94 @@ process_command(query, &mut db);
   db.tables.push(Table::new(cq));
 ```
 
-[Table { columns: [ColumnHeader { name: "id", datatype: Int, is_indexed: true, index: Int({}), is_primary_key: true }, ColumnHeader { name: "name", datatype: Str, is_indexed: false, index: Str({}), is_primary_key: false }, ColumnHeader { name: "score", datatype: Float, is_indexed: false, index: None, is_primary_key: false }], name: "test", rows: {"score": Float([]), "id": Int([]), "name": Str([])} }]
-
-- "insert into _table_ ..."
+- "insert * from _table_ ...;"
 ```rust
 process_command(query, &mut db);
+	let iq = InsertQuery::new(s).unwrap();
+	if !db.table_exists(iq.table_name.to_string()) return;
+	let db_table = db.get_table_mut(iq.table_name.to_string());
+	if !iq.columns.iter().all(|c| db_table.column_exist(c.to_string())) return;
+	for value in &iq.values {
+		if !db_table.does_violate_unique_constraint(&iq.columns, value) return;
+		db_table.insert_row(&iq.columns, &iq.values);
+	}
 ```
 
-- "select * from _table_ ...;"
+- "select into _table_ ..."
 ```rust
 process_command(query, &mut db);
+	let select_query = SelectQuery::new(&s); // parses the query
+		// performs more parsing
+		Ok(SelectQuery { from: name, projection, where_expressions, });
+	if !db.table_exists((&sq.from).to_string() return // checks if table exists
+	let db_table = db.get_table((&sq.from).to_string()); // gets the table
+	for p in &sq.projection.clone() { if p == "*" sq.insert_projections(new_projections); } // deals with "*" symbol
+	for col in &sq.projection { if !db_table.column_exist((&col).to_string()) return; } // checks if columns exist
+	db_table.execute_select_query(&sq); // executes the query
+        let where_expr = sq.where_expressions.first().unwrap() // gets the first where expression
+		let col = self.get_column(where_expr.left.to_string()); // gets the column name
+		let row = self.rows.get(&col.name).unwrap(); // gets the 
+		let indices = row.get_serialized_col_data_by_scanning(&where_expr);
+		let projected_data = sq.projection.iter()
+			.map(|col_name| self.rows.get(&col_name.to_string()).unwrap())
+			.map(|col_data| col_data.get_serialized_col_data_by_index(&indices))
+			.collect::<Vec<Vec<String>>>();
+		return projected_data;
+
 ```
 
+
+```rust
+[Table { 
+	columns: [
+		ColumnHeader { name: "id", datatype: Int, is_indexed: true, index: Int({}), is_primary_key: true }, 
+		ColumnHeader { name: "name", datatype: Str, is_indexed: false, index: Str({}), is_primary_key: false }, 
+		ColumnHeader { name: "score", datatype: Float, is_indexed: false, index: None, is_primary_key: false }], 
+	name: "users", 
+	rows: {"score": Float([]), "id": Int([]), "name": Str([])} 
+}]
+
+[Table { 
+	columns: [
+		ColumnHeader { name: "id", datatype: Int, is_indexed: true, index: Int({1: 0, 2: 1}), is_primary_key: true }, 
+		ColumnHeader { name: "name", datatype: Str, is_indexed: false, index: Str({"\"John Doe\"": 1}), is_primary_key: false }, 
+		ColumnHeader { name: "score", datatype: Float, is_indexed: false, index: None, is_primary_key: false }
+	], 
+	name: "users", 
+	rows: {"id": Int([1, 2]), "score": Float([57.23, 57.23]), "name": Str(["\"John Doe\"", "\"John Doe\""])} 
+}]
+
+```
+
+✅ create table posts (id int PRIMARY KEY, title string, dec string);
+✅ insert into posts(id, title, dec) values(1, "new", "dec");
+```rust
+db = [Table { 
+	columns: [
+		ColumnHeader { name: "id", datatype: Int, is_indexed: true, index: Int({1: 0, 2: 1}), is_primary_key: true }, 
+		ColumnHeader { name: "title", datatype: Str, is_indexed: true, index: Str({"\"new\"": 0, "\"new2\"": 1}), is_primary_key: false }, 
+		ColumnHeader { name: "dec", datatype: Str, is_indexed: true, index: Str({"\"dec\"": 0, "\"dec2\"": 1}), is_primary_key: false }], 
+	name: "posts", 
+	rows: {"id": Int([1, 2]), "title": Str(["new", "new2"]), "dec": Str(["dec", "dec2"])} 
+}]
+```
+
+
+✅ select * from posts; / select * from posts where id = 1;
+```js
+let result = []
+for (let (id, i) of db.rows.id ) {
+	let row = [rows.id[i], rows.title[i], rows.dec[i]]
+}	result.push(row)
+return result;
+```
+
+```js
+input: id = 1
+
+let column = db.columns.find(c => c.name === 'id')
+let idx = column.index[id] // 0
+let row = [rows.id[idx], rows.title[idx], rows.dec[idx]]
+return row
+
+```
