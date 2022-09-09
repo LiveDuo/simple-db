@@ -96,12 +96,12 @@ fn handle_meta_command(cmd: MetaCommand, db: &mut Database) {
             }
         }
         MetaCommand::Persist => {
-            let mut buffered_writer = BufWriter::new(File::create("dbfile1.bin").unwrap());
+            let mut buffered_writer = BufWriter::new(File::create("data.bin").unwrap());
             bincode::serialize_into(&mut buffered_writer, &db)
                 .expect("Error while trying to serialize to binary data");
         }
         MetaCommand::Restore => {
-            let mut file = File::open("dbfile1.bin").unwrap();
+            let mut file = File::open("data.bin").unwrap();
             let decoded_db: Database = bincode::deserialize_from(&mut file).unwrap();
             *db = decoded_db;
         }
@@ -156,6 +156,8 @@ fn process_command(query: String, db: &mut Database) {
                     }
                     Err(err) => println!("Error while trying to parse insert statement: {}", err),
                 }
+
+                println!("{:?}", db.tables);
             }
             Statement::Query(_q) => {
                 let select_query = SelectQuery::new(&s);
